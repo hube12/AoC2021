@@ -1,0 +1,15 @@
+
+**/.idea/
+
+**/target/
+
+**/.vscode/
+
+**/perf.data**
+*.svg
+
+day2/out/
+
+temp/
+
+*.nim
