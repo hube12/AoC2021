@@ -1,16 +1,29 @@
 [package]
-name = "Aoc-day1-2021"
+name = "Aoc-2021"
 version = "0.1.0"
 authors = ["Neil <neilhube12@gmail.com"]
 edition = "2021"
-description="Day 1 of AoC 2021"
+description="AoC 2021"
 categories=["algorithms","data-structures"]
 license="MIT"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[lib]
+path="src/lib.rs"
+name="aoc_2021"
+
+[[bin]]
+path="src/runner.rs"
+name="run"
+[[bin]]
+path="src/playground.rs"
+name="playground"
+
+
 [dependencies]
 anyhow = "1.0.51"
+num-traits = "0.2.14"
 
 [profile.dev]
 opt-level = 3
