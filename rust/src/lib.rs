@@ -19,11 +19,17 @@ pub fn valid_day(day: &str) -> anyhow::Result<usize> {
         if let Ok(number) = usize::from_str_radix(number, 10) {
             return match number {
                 1..=25 => Ok(number),
-                e => Err(anyhow::Error::msg(format!("Not a valid day number (1-25) : {}",e))),
+                e => Err(anyhow::Error::msg(format!(
+                    "Not a valid day number (1-25) : {}",
+                    e
+                ))),
             };
         }
     }
-    Err(anyhow::Error::msg(format!("Not a valid day format dayX (X:1-25) : {}",day)))
+    Err(anyhow::Error::msg(format!(
+        "Not a valid day format dayX (X:1-25) : {}",
+        day
+    )))
 }
 
 impl std::fmt::Display for Part {
@@ -54,7 +60,7 @@ pub fn collect_file<T: Ord + Eq + Clone + std::str::FromStr>(
 where
     <T as std::str::FromStr>::Err: std::error::Error + Sync + Send,
 {
-    let day=day.trim().to_lowercase();
+    let day = day.trim().to_lowercase();
     valid_day(&*day)?;
     let path = format!("input/{}/{}", day, part);
     let input = std::fs::read_to_string(path)?;
@@ -71,16 +77,14 @@ where
 }
 
 pub trait Solution1 {
-    type Output: std::fmt::Display;
-    fn run_solution1<Input: AsRef<str>>(&self,lines: Vec<Input>) -> anyhow::Result<Self::Output>;
+    fn run_solution1(&self, lines: Vec<String>) -> anyhow::Result<String>;
 }
 
 pub trait Solution2 {
-    type Output: std::fmt::Display;
-    fn run_solution2<Input: AsRef<str>>(&self,lines: Vec<Input>) -> anyhow::Result<Self::Output>;
+    fn run_solution2(&self, lines: Vec<String>) -> anyhow::Result<String>;
 }
 
-pub trait Day: Solution1 + Solution2{}
+pub trait Day: Solution1 + Solution2 {}
 
 #[test]
 fn test() {

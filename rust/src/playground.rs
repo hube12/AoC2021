@@ -52,11 +52,16 @@ impl TestR for Test2 {
     }
 }
 
-pub fn match_it<T>(x: &str) -> Box<T> where T:Test, T::TestR::Output:std::fmt::Display,T::TestL::Output:std::fmt::Display{
+pub fn match_it<T>(x: &str) -> Box<T>
+where
+    T: Test,
+    T::TestR::Output: std::fmt::Display,
+    T::TestL::Output: std::fmt::Display,
+{
     match x {
         "1" => Box::new(Test1 {}),
         "2" => Box::new(Test2 {}),
-        _ => unreachable!()
+        _ => unreachable!(),
     }
 }
 

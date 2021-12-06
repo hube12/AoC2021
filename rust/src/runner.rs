@@ -1,8 +1,6 @@
 use crate::days::*;
 use aoc_2021::Part::{Part1, Part2};
-use aoc_2021::{collect_file, Solution1, Solution2, valid_day, handle_solution, Day};
-
-
+use aoc_2021::{collect_file, handle_solution, valid_day, Day};
 
 mod days;
 
@@ -10,10 +8,9 @@ fn match_day(x: usize) -> Box<dyn Day> {
     match x {
         1 => Box::from(Day1),
         2 => Box::from(Day2),
-        _ => unimplemented!("Missing day")
+        _ => unimplemented!("Missing day"),
     }
 }
-
 
 fn main() -> anyhow::Result<()> {
     let mut buffer = String::new();

@@ -6,9 +6,7 @@ pub struct Day1;
 impl Day for Day1 {}
 
 impl Solution1 for Day1 {
-    type Output = usize;
-
-    fn run_solution1<Input: AsRef<str>>(&self, lines: Vec<Input>) -> anyhow::Result<usize> {
+    fn run_solution1(&self, lines: Vec<String>) -> anyhow::Result<String> {
         let transpose: Vec<usize> = parse_uint(lines)?;
         let mut iter = transpose.iter();
         let mut last = iter
@@ -21,13 +19,12 @@ impl Solution1 for Day1 {
             }
             last = next
         }
-        Ok(counter)
+        Ok(counter.to_string())
     }
 }
 
 impl Solution2 for Day1 {
-    type Output = usize;
-    fn run_solution2<Input: AsRef<str>>(&self, lines: Vec<Input>) -> anyhow::Result<usize> {
+    fn run_solution2(&self, lines: Vec<String>) -> anyhow::Result<String> {
         let transpose: Vec<usize> = lines
             .iter()
             .map(|x| usize::from_str_radix(x.as_ref(), 10))
@@ -61,7 +58,7 @@ impl Solution2 for Day1 {
             // update rolling buffer
             last = slide1;
         }
-        Ok(counter)
+        Ok(counter.to_string())
     }
 }
 
