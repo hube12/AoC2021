@@ -5,9 +5,8 @@ pub struct Day4;
 
 impl Day for Day4 {}
 
-use anyhow::anyhow;
-use std::collections::{HashMap, HashSet};
 use std::collections::hash_map::Entry;
+use std::collections::{HashMap, HashSet};
 
 #[derive(Debug)]
 pub struct Board {
@@ -17,7 +16,7 @@ pub struct Board {
     rows: Vec<usize>,
     /// Marked number in each row
     cols: Vec<usize>,
-    marked:HashSet<usize>,
+    marked: HashSet<usize>,
 }
 
 impl Default for Board {
@@ -27,45 +26,45 @@ impl Default for Board {
             rows: vec![5; 5],
             cols: vec![5; 5],
             // technically you can not know the lower bound but we assume that a 5 should happen at this point
-            marked:HashSet::with_capacity(20),
+            marked: HashSet::with_capacity(20),
         }
     }
 }
 
-impl Board{
-    fn insert_line(&mut self,line:&String,row:usize)->anyhow::Result<()>{
-        for (col,number) in line.split_whitespace().enumerate(){
-            let number=usize::from_str_radix(number, 10)?;
-            match self.map.entry(number){
+impl Board {
+    fn insert_line(&mut self, line: &String, row: usize) -> anyhow::Result<()> {
+        for (col, number) in line.split_whitespace().enumerate() {
+            let number = usize::from_str_radix(number, 10)?;
+            match self.map.entry(number) {
                 Entry::Occupied(mut e) => {
-                    e.get_mut().push((col,row));
+                    e.get_mut().push((col, row));
                 }
                 Entry::Vacant(e) => {
-                    e.insert(vec![(col,row)]);
+                    e.insert(vec![(col, row)]);
                 }
             }
         }
         Ok(())
     }
 
-    fn mark_number(&mut self,number:usize){
-        if self.marked.contains(&number){
+    fn mark_number(&mut self, number: usize) {
+        if self.marked.contains(&number) {
             return;
         }
-        if let Some(positions)=self.map.get(&number){
-            for (row,col) in positions{
-                self.rows[*row]-=1;
-                self.cols[*col]-=1;
+        if let Some(positions) = self.map.get(&number) {
+            for (row, col) in positions {
+                self.rows[*row] -= 1;
+                self.cols[*col] -= 1;
             }
             self.marked.insert(number);
         }
     }
 
     fn has_finished(&self) -> bool {
-        self.rows.iter().any(|x| *x==0) || self.cols.iter().any(|x| *x==0)
+        self.rows.iter().any(|x| *x == 0) || self.cols.iter().any(|x| *x == 0)
     }
 
-    fn score(&self)->usize{
+    fn score(&self) -> usize {
         self.map.keys().filter(|&x| !self.marked.contains(x)).sum()
     }
 }
@@ -80,28 +79,30 @@ impl Solution1 for Day4 {
             .split(",")
             .map(|x| usize::from_str_radix(x, 10))
             .collect::<Result<_, _>>()?;
-        let mut boards =vec![];
-        loop{
-            if let Some(_)=iter.next(){
-                let mut board =Board::default();
+        let mut boards = vec![];
+        loop {
+            if let Some(_) = iter.next() {
+                let mut board = Board::default();
                 for row in 0..5 {
-                    let line=iter.next().ok_or(anyhow::Error::msg("Missing a board line"))?;
-                    board.insert_line(line,row);
+                    let line = iter
+                        .next()
+                        .ok_or(anyhow::Error::msg("Missing a board line"))?;
+                    board.insert_line(line, row)?;
                 }
                 boards.push(board);
-            }else{
+            } else {
                 break;
             }
         }
-        for number in numbers{
-            for board in &mut boards{
+        for number in numbers {
+            for board in &mut boards {
                 board.mark_number(number);
-                if board.has_finished(){
-                    return Ok((board.score()*number).to_string())
+                if board.has_finished() {
+                    return Ok((board.score() * number).to_string());
                 }
             }
         }
-       Err(anyhow::Error::msg("No board did finish"))
+        Err(anyhow::Error::msg("No board did finish"))
     }
 }
 
@@ -115,33 +116,35 @@ impl Solution2 for Day4 {
             .split(",")
             .map(|x| usize::from_str_radix(x, 10))
             .collect::<Result<_, _>>()?;
-        let mut boards =vec![];
-        loop{
-            if let Some(_)=iter.next(){
-                let mut board =Board::default();
+        let mut boards = vec![];
+        loop {
+            if let Some(_) = iter.next() {
+                let mut board = Board::default();
                 for row in 0..5 {
-                    let line=iter.next().ok_or(anyhow::Error::msg("Missing a board line"))?;
-                    board.insert_line(line,row);
+                    let line = iter
+                        .next()
+                        .ok_or(anyhow::Error::msg("Missing a board line"))?;
+                    board.insert_line(line, row)?;
                 }
                 boards.push(board);
-            }else{
+            } else {
                 break;
             }
         }
-        for number in numbers{
-            let len=boards.len();
-            let mut to_keep=Vec::with_capacity(len);
-            for mut board in boards{
+        for number in numbers {
+            let len = boards.len();
+            let mut to_keep = Vec::with_capacity(len);
+            for mut board in boards {
                 board.mark_number(number);
-                if !board.has_finished(){
+                if !board.has_finished() {
                     to_keep.push(board)
-                } else{
-                    if len==1{
-                        return Ok((board.score()*number).to_string())
+                } else {
+                    if len == 1 {
+                        return Ok((board.score() * number).to_string());
                     }
                 }
             }
-            boards=to_keep;
+            boards = to_keep;
         }
         Err(anyhow::Error::msg("No board did finish"))
     }
