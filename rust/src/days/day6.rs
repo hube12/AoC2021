@@ -5,7 +5,6 @@ pub struct Day6;
 
 impl Day for Day6 {}
 
-
 impl Solution1 for Day6 {
     fn run_solution1(&self, lines: Vec<String>) -> anyhow::Result<String> {
         let mut fishes: Vec<usize> = lines
@@ -17,12 +16,12 @@ impl Solution1 for Day6 {
         let mut new_fishes = Vec::with_capacity(100);
         for _ in 0..80 {
             new_fishes.clear();
-            fishes.iter_mut().for_each(| x| {
+            fishes.iter_mut().for_each(|x| {
                 if *x == 0 {
                     new_fishes.push(8);
-                    *x=6;
-                }else{
-                    *x -=1;
+                    *x = 6;
+                } else {
+                    *x -= 1;
                 }
             });
             fishes.extend(&new_fishes);
@@ -39,15 +38,15 @@ impl Solution2 for Day6 {
             .split(',')
             .map(|x| usize::from_str_radix(x, 10))
             .collect::<Result<_, _>>()?;
-        const NUMBER_DAYS:usize=9;
-        const OFFSET_DAYS:usize=7;
-        let mut days =[0u128; NUMBER_DAYS];
-        for fish in fishes{
-            days[fish]+=1;
+        const NUMBER_DAYS: usize = 9;
+        const OFFSET_DAYS: usize = 7;
+        let mut days = [0u128; NUMBER_DAYS];
+        for fish in fishes {
+            days[fish] += 1;
         }
-        for day in 0..256{
-            let today=day%NUMBER_DAYS;
-            days[(today+OFFSET_DAYS)%NUMBER_DAYS]+=days[today]
+        for day in 0..256 {
+            let today = day % NUMBER_DAYS;
+            days[(today + OFFSET_DAYS) % NUMBER_DAYS] += days[today]
         }
         Ok(days.iter().sum::<u128>().to_string())
     }

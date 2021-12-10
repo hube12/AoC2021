@@ -8,6 +8,11 @@ fn match_day(x: usize) -> Box<dyn Day> {
     match x {
         1 => Box::from(Day1),
         2 => Box::from(Day2),
+        3 => Box::from(Day3),
+        4 => Box::from(Day4),
+        5 => Box::from(Day5),
+        6 => Box::from(Day6),
+        7 => Box::from(Day7),
         _ => unimplemented!("Missing day"),
     }
 }
