@@ -1,6 +1,5 @@
 use aoc_2021::{Day, Solution1, Solution2};
-use std::collections::HashSet;
-use std::convert::{TryFrom, TryInto};
+use std::convert::TryFrom;
 
 #[derive(Default)]
 pub struct Day10;
@@ -30,7 +29,7 @@ impl Token {
             _ => { return Err(anyhow::Error::msg("Not a Right token")); }
         })
     }
-
+    #[allow(dead_code)]
     fn next(&self) -> anyhow::Result<Self> {
         Ok(match self {
             Token::LParenthesis => Token::RParenthesis,
@@ -41,6 +40,7 @@ impl Token {
         })
     }
 
+    #[allow(dead_code)]
     fn is_left(&self) -> bool {
         match self {
             Token::LParenthesis |
