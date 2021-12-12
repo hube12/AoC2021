@@ -8,14 +8,16 @@ impl Day for Day7 {}
 
 //  Next approximate gm computed from a non-member point p
 fn nxnonmember<T: Copy + PartialOrd + std::fmt::Display>(points: &[Vec<T>], p: &[f64]) -> Vec<f64>
-    where
-        f64: From<T>,
+where
+    f64: From<T>,
 {
     let mut vsum = vec![0_f64; points.len()];
     let mut recip = 0_f64;
     for point in points {
         let mag = euclidean_dist(point, p).sqrt();
-        if !mag.is_normal() { continue; } // zero distance, safe to ignore
+        if !mag.is_normal() {
+            continue;
+        } // zero distance, safe to ignore
 
         let rec = 1.0_f64 / mag;
         let weights: Vec<f64> = point.iter().map(|&x| rec * f64::from(x)).collect();
@@ -30,8 +32,8 @@ fn nxnonmember<T: Copy + PartialOrd + std::fmt::Display>(points: &[Vec<T>], p: &
 
 // simple multidimensional arithmetic mean
 fn acentroid<T: Copy + PartialOrd + std::fmt::Display>(points: &[Vec<T>]) -> Vec<f64>
-    where
-        f64: From<T>,
+where
+    f64: From<T>,
 {
     // all the centres on each dim
     let mut centres: Vec<f64> = vec![0_f64; points.len()];
@@ -49,8 +51,9 @@ fn acentroid<T: Copy + PartialOrd + std::fmt::Display>(points: &[Vec<T>]) -> Vec
 
 /// Non Squared euclidean distance
 fn euclidean_dist<T: Copy + PartialOrd + std::fmt::Display>(v: &[T], p: &[f64]) -> f64
-    where
-        f64: From<T> {
+where
+    f64: From<T>,
+{
     v.iter()
         .zip(p)
         .map(|(&xi, &vi)| (f64::from(xi) - vi).powi(2))
@@ -58,51 +61,69 @@ fn euclidean_dist<T: Copy + PartialOrd + std::fmt::Display>(v: &[T], p: &[f64]) 
 }
 
 fn geometric_median<T: Copy + PartialOrd + std::fmt::Display>(v: &[Vec<T>], eps: f64) -> Vec<f64>
-    where
-        f64: From<T>
+where
+    f64: From<T>,
 {
     let eps2: f64 = eps.powi(2);
     let mut point: Vec<f64> = acentroid(v);
-    loop { // vector iteration till accuracy eps is reached
+    loop {
+        // vector iteration till accuracy eps is reached
         let nextp: Vec<f64> = nxnonmember(v, &point);
-        if euclidean_dist::<f64>(nextp.as_slice(), &point) < eps2 { return nextp; }; // termination
+        if euclidean_dist::<f64>(nextp.as_slice(), &point) < eps2 {
+            return nextp;
+        }; // termination
         point = nextp
     }
 }
 
 fn calculate_dist<T: Copy + PartialOrd + std::fmt::Display>(v: &[Vec<T>], p: &[T]) -> f64
-    where
-        f64: From<T> {
-    v.iter().map(|x| x.iter().zip(p).map(|(&vi, &pi)| (f64::from(vi) - f64::from(pi)).abs()).sum::<f64>()).sum()
+where
+    f64: From<T>,
+{
+    v.iter()
+        .map(|x| {
+            x.iter()
+                .zip(p)
+                .map(|(&vi, &pi)| (f64::from(vi) - f64::from(pi)).abs())
+                .sum::<f64>()
+        })
+        .sum()
 }
 
-fn dist(v:&Vec<usize>,p:usize)->usize{
-    v.iter().map(|&x| ((p as isize).sub(x as isize)).abs() as usize).sum()
+fn dist(v: &Vec<usize>, p: usize) -> usize {
+    v.iter()
+        .map(|&x| ((p as isize).sub(x as isize)).abs() as usize)
+        .sum()
 }
 
 #[allow(dead_code)]
-fn dumb_solution(lines:Vec<String>) -> anyhow::Result<String> {
+fn dumb_solution(lines: Vec<String>) -> anyhow::Result<String> {
     let crabs: Vec<usize> = lines
         .first()
         .ok_or(anyhow::Error::msg("Missing a line"))?
         .split(',')
         .map(|x| usize::from_str_radix(x, 10))
         .collect::<Result<_, _>>()?;
-    let min=*crabs.iter().min().ok_or(anyhow::Error::msg("Missing an element"))?;
-    let max=*crabs.iter().max().ok_or(anyhow::Error::msg("Missing an element"))?;
-    let mut min_dist=usize::MAX;
-    let mut _pos_min=0usize;
+    let min = *crabs
+        .iter()
+        .min()
+        .ok_or(anyhow::Error::msg("Missing an element"))?;
+    let max = *crabs
+        .iter()
+        .max()
+        .ok_or(anyhow::Error::msg("Missing an element"))?;
+    let mut min_dist = usize::MAX;
+    let mut _pos_min = 0usize;
     for pos in min..max {
-        let dist=dist(&crabs,pos);
-        if dist<min_dist{
-            min_dist=dist;
-            _pos_min=pos;
+        let dist = dist(&crabs, pos);
+        if dist < min_dist {
+            min_dist = dist;
+            _pos_min = pos;
         }
     }
     dbg!(_pos_min);
     Ok(min_dist.to_string())
 }
-
 
 impl Solution1 for Day7 {
     fn run_solution1(&self, lines: Vec<String>) -> anyhow::Result<String> {
@@ -113,14 +134,17 @@ impl Solution1 for Day7 {
             .map(|x| usize::from_str_radix(x, 10).map(|x| vec![x as f64]))
             .collect::<Result<_, _>>()?;
         let r = geometric_median(&crabs, 0.001);
-        let first=r[0].round(); // we don't consider geometric median that are not integer
-        let dist=calculate_dist(&crabs, &[first as f64]);
+        let first = r[0].round(); // we don't consider geometric median that are not integer
+        let dist = calculate_dist(&crabs, &[first as f64]);
         Ok(dist.to_string())
     }
 }
 
-fn dist_arithmetic_suite(v:&Vec<usize>,p:usize)->usize{
-    v.iter().map(|&x| ((p as isize).sub(x as isize)).abs() as usize).map(|x| (x+1)*x/2).sum()
+fn dist_arithmetic_suite(v: &Vec<usize>, p: usize) -> usize {
+    v.iter()
+        .map(|&x| ((p as isize).sub(x as isize)).abs() as usize)
+        .map(|x| (x + 1) * x / 2)
+        .sum()
 }
 
 impl Solution2 for Day7 {
@@ -131,15 +155,21 @@ impl Solution2 for Day7 {
             .split(',')
             .map(|x| usize::from_str_radix(x, 10))
             .collect::<Result<_, _>>()?;
-        let min=*crabs.iter().min().ok_or(anyhow::Error::msg("Missing an element"))?;
-        let max=*crabs.iter().max().ok_or(anyhow::Error::msg("Missing an element"))?;
-        let mut min_dist=usize::MAX;
-        let mut _pos_min=0usize;
+        let min = *crabs
+            .iter()
+            .min()
+            .ok_or(anyhow::Error::msg("Missing an element"))?;
+        let max = *crabs
+            .iter()
+            .max()
+            .ok_or(anyhow::Error::msg("Missing an element"))?;
+        let mut min_dist = usize::MAX;
+        let mut _pos_min = 0usize;
         for pos in min..max {
-            let dist=dist_arithmetic_suite(&crabs,pos);
-            if dist<min_dist{
-                min_dist=dist;
-                _pos_min=pos;
+            let dist = dist_arithmetic_suite(&crabs, pos);
+            if dist < min_dist {
+                min_dist = dist;
+                _pos_min = pos;
             }
         }
         Ok(min_dist.to_string())
@@ -188,9 +218,7 @@ mod test {
                 // simple euclidean distance
                 p.iter()
                     .zip(&centroid)
-                    .map(|(&xi, &vi)|
-                        (f64::from(xi) - f64::from(vi)).powi(2)
-                    )
+                    .map(|(&xi, &vi)| (f64::from(xi) - f64::from(vi)).powi(2))
                     .sum::<f64>()
                     .sqrt()
             })

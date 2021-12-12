@@ -26,7 +26,9 @@ impl Token {
             Token::RBrackets => Token::LBrackets,
             Token::RCurly => Token::LCurly,
             Token::RFish => Token::LFish,
-            _ => { return Err(anyhow::Error::msg("Not a Right token")); }
+            _ => {
+                return Err(anyhow::Error::msg("Not a Right token"));
+            }
         })
     }
     #[allow(dead_code)]
@@ -36,28 +38,24 @@ impl Token {
             Token::LBrackets => Token::RBrackets,
             Token::LCurly => Token::RCurly,
             Token::LFish => Token::RFish,
-            _ => { return Err(anyhow::Error::msg("Not a Left token")); }
+            _ => {
+                return Err(anyhow::Error::msg("Not a Left token"));
+            }
         })
     }
 
     #[allow(dead_code)]
     fn is_left(&self) -> bool {
         match self {
-            Token::LParenthesis |
-            Token::LBrackets |
-            Token::LCurly |
-            Token::LFish => true,
-            _ => false
+            Token::LParenthesis | Token::LBrackets | Token::LCurly | Token::LFish => true,
+            _ => false,
         }
     }
 
     fn is_right(&self) -> bool {
         match self {
-            Token::RParenthesis |
-            Token::RBrackets |
-            Token::RCurly |
-            Token::RFish => true,
-            _ => false
+            Token::RParenthesis | Token::RBrackets | Token::RCurly | Token::RFish => true,
+            _ => false,
         }
     }
 }
@@ -75,7 +73,9 @@ impl TryFrom<char> for Token {
             '}' => Token::RCurly,
             '<' => Token::LFish,
             '>' => Token::RFish,
-            _ => { return Err(anyhow::Error::msg("Not a valid token for parser")); }
+            _ => {
+                return Err(anyhow::Error::msg("Not a valid token for parser"));
+            }
         })
     }
 }
@@ -94,7 +94,6 @@ impl From<Token> for usize {
         }
     }
 }
-
 
 impl Solution1 for Day10 {
     fn run_solution1(&self, lines: Vec<String>) -> anyhow::Result<String> {
@@ -124,7 +123,7 @@ impl Solution2 for Day10 {
     fn run_solution2(&self, lines: Vec<String>) -> anyhow::Result<String> {
         let mut points = Vec::with_capacity(lines.len());
         for line in lines {
-            let mut point =0usize;
+            let mut point = 0usize;
             let mut stack: Vec<Token> = Vec::with_capacity(line.len());
             let mut corrupted = false;
             for c in line.chars() {
@@ -151,10 +150,9 @@ impl Solution2 for Day10 {
                 }
                 points.push(point);
             }
-
         }
         points.sort();
-        Ok(points[points.len()/2].to_string())
+        Ok(points[points.len() / 2].to_string())
     }
 }
 

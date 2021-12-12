@@ -6,16 +6,22 @@ pub struct Day9;
 
 impl Day for Day9 {}
 
-
 impl Solution1 for Day9 {
     fn run_solution1(&self, lines: Vec<String>) -> anyhow::Result<String> {
-        let length = lines.first().ok_or(anyhow::Error::msg("Missing a line"))?.len();
+        let length = lines
+            .first()
+            .ok_or(anyhow::Error::msg("Missing a line"))?
+            .len();
         let height = lines.len();
         let mut matrix = Vec::with_capacity(height);
         for line in lines {
             let mut l = Vec::with_capacity(length);
             for digit in line.chars() {
-                l.push(digit.to_digit(10).ok_or(anyhow::Error::msg("Not a number"))?)
+                l.push(
+                    digit
+                        .to_digit(10)
+                        .ok_or(anyhow::Error::msg("Not a number"))?,
+                )
             }
             matrix.push(l)
         }
@@ -24,7 +30,10 @@ impl Solution1 for Day9 {
             for x in 0..length {
                 let current = matrix[y][x];
                 let adjacent_positions = get_adjacent_positions(x, y, height, length);
-                if adjacent_positions.iter().all(|&(ax, ay)| matrix[ay][ax] > current) {
+                if adjacent_positions
+                    .iter()
+                    .all(|&(ax, ay)| matrix[ay][ax] > current)
+                {
                     ctr += current + 1;
                 }
             }
@@ -47,13 +56,20 @@ fn get_adjacent_positions(x: usize, y: usize, height: usize, length: usize) -> V
 
 impl Solution2 for Day9 {
     fn run_solution2(&self, lines: Vec<String>) -> anyhow::Result<String> {
-        let length = lines.first().ok_or(anyhow::Error::msg("Missing a line"))?.len();
+        let length = lines
+            .first()
+            .ok_or(anyhow::Error::msg("Missing a line"))?
+            .len();
         let height = lines.len();
         let mut matrix = Vec::with_capacity(height);
         for line in lines {
             let mut l = Vec::with_capacity(length);
             for digit in line.chars() {
-                l.push(digit.to_digit(10).ok_or(anyhow::Error::msg("Not a number"))?)
+                l.push(
+                    digit
+                        .to_digit(10)
+                        .ok_or(anyhow::Error::msg("Not a number"))?,
+                )
             }
             matrix.push(l)
         }
@@ -62,7 +78,10 @@ impl Solution2 for Day9 {
             for x in 0..length {
                 let current = matrix[y][x];
                 let adjacent_positions = get_adjacent_positions(x, y, height, length);
-                if adjacent_positions.iter().all(|&(ax, ay)| matrix[ay][ax] > current) {
+                if adjacent_positions
+                    .iter()
+                    .all(|&(ax, ay)| matrix[ay][ax] > current)
+                {
                     let mut set = HashSet::with_capacity(100);
                     recursive_flow(x, y, height, length, &mut matrix, &mut set);
                     bassins_length.push(set.len());
@@ -70,13 +89,25 @@ impl Solution2 for Day9 {
             }
         }
         bassins_length.sort();
-        Ok(bassins_length.iter().rev().take(3).fold(1usize,|x,&y| x*y).to_string())
+        Ok(bassins_length
+            .iter()
+            .rev()
+            .take(3)
+            .fold(1usize, |x, &y| x * y)
+            .to_string())
     }
 }
 
-fn recursive_flow(x: usize, y: usize, height: usize, length: usize, matrix: &Vec<Vec<u32>>, acc: &mut HashSet<(usize, usize)>) {
+fn recursive_flow(
+    x: usize,
+    y: usize,
+    height: usize,
+    length: usize,
+    matrix: &Vec<Vec<u32>>,
+    acc: &mut HashSet<(usize, usize)>,
+) {
     let value = matrix[y][x];
-    if value==9 || acc.contains(&(x, y)){
+    if value == 9 || acc.contains(&(x, y)) {
         return;
     } else {
         acc.insert((x, y));

@@ -6,16 +6,22 @@ pub struct Day11;
 
 impl Day for Day11 {}
 
-
 impl Solution1 for Day11 {
     fn run_solution1(&self, lines: Vec<String>) -> anyhow::Result<String> {
-        let length = lines.first().ok_or(anyhow::Error::msg("Missing a line"))?.len();
+        let length = lines
+            .first()
+            .ok_or(anyhow::Error::msg("Missing a line"))?
+            .len();
         let height = lines.len();
         let mut matrix = Vec::with_capacity(height);
         for line in lines {
             let mut l = Vec::with_capacity(length);
             for digit in line.chars() {
-                l.push(digit.to_digit(10).ok_or(anyhow::Error::msg("Not a number"))?)
+                l.push(
+                    digit
+                        .to_digit(10)
+                        .ok_or(anyhow::Error::msg("Not a number"))?,
+                )
             }
             matrix.push(l)
         }
@@ -33,7 +39,7 @@ fn step(matrix: &mut Vec<Vec<u32>>, height: usize, length: usize) -> usize {
     for (y, row) in matrix.iter_mut().enumerate() {
         for (x, squid) in row.iter_mut().enumerate() {
             *squid += 1;
-            if *squid> 9 {
+            if *squid > 9 {
                 should_flash.push((x, y));
             }
         }
@@ -51,13 +57,19 @@ fn step(matrix: &mut Vec<Vec<u32>>, height: usize, length: usize) -> usize {
     has_flashed.len()
 }
 
-fn recursive_flash(x: usize, y: usize, height: usize, length: usize, matrix: &mut Vec<Vec<u32>>, has_flashed: &mut HashSet<(usize, usize)>) {
-
+fn recursive_flash(
+    x: usize,
+    y: usize,
+    height: usize,
+    length: usize,
+    matrix: &mut Vec<Vec<u32>>,
+    has_flashed: &mut HashSet<(usize, usize)>,
+) {
     let value = matrix[y][x];
     if value <= 9 || has_flashed.contains(&(x, y)) {
         return;
-    }else{
-        has_flashed.insert((x,y));
+    } else {
+        has_flashed.insert((x, y));
     }
 
     for (ax, ay) in get_adjacent_positions(x, y, height, length) {
@@ -70,7 +82,16 @@ fn get_adjacent_positions(x: usize, y: usize, height: usize, length: usize) -> V
     let (x, y) = (x as isize, y as isize);
     let (length, height) = (length as isize, height as isize);
     let mut v = Vec::with_capacity(4);
-    for (x1, y1) in [(x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1), (x - 1, y - 1), (x + 1, y - 1), (x - 1, y + 1), (x + 1, y + 1)] {
+    for (x1, y1) in [
+        (x - 1, y),
+        (x + 1, y),
+        (x, y - 1),
+        (x, y + 1),
+        (x - 1, y - 1),
+        (x + 1, y - 1),
+        (x - 1, y + 1),
+        (x + 1, y + 1),
+    ] {
         if !(x1 >= length || y1 >= height || y1 < 0 || x1 < 0) {
             v.push((x1 as usize, y1 as usize))
         }
@@ -80,23 +101,30 @@ fn get_adjacent_positions(x: usize, y: usize, height: usize, length: usize) -> V
 
 impl Solution2 for Day11 {
     fn run_solution2(&self, lines: Vec<String>) -> anyhow::Result<String> {
-        let length = lines.first().ok_or(anyhow::Error::msg("Missing a line"))?.len();
+        let length = lines
+            .first()
+            .ok_or(anyhow::Error::msg("Missing a line"))?
+            .len();
         let height = lines.len();
         let mut matrix = Vec::with_capacity(height);
         for line in lines {
             let mut l = Vec::with_capacity(length);
             for digit in line.chars() {
-                l.push(digit.to_digit(10).ok_or(anyhow::Error::msg("Not a number"))?)
+                l.push(
+                    digit
+                        .to_digit(10)
+                        .ok_or(anyhow::Error::msg("Not a number"))?,
+                )
             }
             matrix.push(l)
         }
-        let mut step_i =1;
-        loop{
-            let flashes=step(&mut matrix, height, length);
-            if flashes==height*length{
-               break;
+        let mut step_i = 1;
+        loop {
+            let flashes = step(&mut matrix, height, length);
+            if flashes == height * length {
+                break;
             }
-            step_i+=1;
+            step_i += 1;
         }
         Ok(step_i.to_string())
     }
