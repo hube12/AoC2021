@@ -1,5 +1,5 @@
 use aoc_2021::{Day, Solution1, Solution2};
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 use std::hash::Hash;
 
 #[derive(Default)]
@@ -64,8 +64,8 @@ impl Solution1 for Day12 {
                 .push(link_a.clone());
         }
         // current path for each traversal (we assume 100 long path are about as much as it can be)
-        let mut stack = HashMap::with_capacity(100);
-        let sum = graph_traversal::<1, false>(&Caves::Start, &links, stack, vec![])?;
+        let stack = HashMap::with_capacity(100);
+        let sum = graph_traversal::<1, false>(&Caves::Start, &links, stack)?;
         Ok(sum.to_string())
     }
 }
@@ -74,12 +74,10 @@ fn graph_traversal<const LIMIT: u8, const CHECK: bool>(
     current: &Caves,
     links: &HashMap<Caves, Vec<Caves>>,
     mut tracked_path: HashMap<Caves, u8>,
-    mut path: Vec<Caves>,
 ) -> anyhow::Result<usize> {
     let next_ones = links
         .get(current)
         .ok_or(anyhow::Error::msg("Missing current"))?;
-    path.push(current.clone());
     if tracked_path.get(current) == Some(&LIMIT) {
         return Ok(0);
     }
@@ -101,7 +99,7 @@ fn graph_traversal<const LIMIT: u8, const CHECK: bool>(
     let mut sum = 0;
     for next in next_ones {
         let current =
-            graph_traversal::<LIMIT, CHECK>(next, links, tracked_path.clone(), path.clone())?;
+            graph_traversal::<LIMIT, CHECK>(next, links, tracked_path.clone())?;
         sum += current;
     }
     return Ok(sum);
@@ -129,8 +127,8 @@ impl Solution2 for Day12 {
                 .push(link_a.clone());
         }
         // current path for each traversal (we assume 100 long path are about as much as it can be)
-        let mut stack = HashMap::with_capacity(100);
-        let sum = graph_traversal::<2, true>(&Caves::Start, &links, stack, vec![])?;
+        let stack = HashMap::with_capacity(100);
+        let sum = graph_traversal::<2, true>(&Caves::Start, &links, stack)?;
         Ok(sum.to_string())
     }
 }
