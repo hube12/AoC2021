@@ -1,5 +1,5 @@
 use aoc_2021::{Day, Solution1, Solution2};
-use std::collections::HashSet}
+use std::collections::HashSet;
 
 #[derive(Default)]
 pub struct Day9;
