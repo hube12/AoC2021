@@ -18,6 +18,7 @@ fn match_day(x: usize) -> Box<dyn Day> {
         10 => Box::from(Day10),
         11 => Box::from(Day11),
         12 => Box::from(Day12),
+        13 => Box::from(Day13),
         _ => unimplemented!("Missing day"),
     }
 }
@@ -35,7 +36,7 @@ fn main() -> anyhow::Result<()> {
                 println!("---------------------------------");
                 let runner = match_day(x);
                 println!("Running Part 1");
-                let lines: Vec<String> = collect_file(Part1, day)?;
+                let lines: Vec<String> = collect_file(Part1, &*format!("day{}", x))?;
                 let time = std::time::Instant::now();
                 let r = runner.run_solution1(lines);
                 let time = std::time::Instant::now().duration_since(time).as_micros();
@@ -44,7 +45,7 @@ fn main() -> anyhow::Result<()> {
                 println!("---------------------------------");
 
                 println!("Running Part 2");
-                let lines: Vec<String> = collect_file(Part2, day)?;
+                let lines: Vec<String> = collect_file(Part2, &*format!("day{}", x))?;
                 let time = std::time::Instant::now();
                 let r = runner.run_solution2(lines);
                 let time = std::time::Instant::now().duration_since(time).as_micros();

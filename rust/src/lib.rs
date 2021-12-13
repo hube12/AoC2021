@@ -2,7 +2,7 @@ use num_traits::Num;
 
 pub fn handle_solution<T: std::fmt::Display>(solution: anyhow::Result<T>) {
     match solution {
-        Ok(solution) => println!("Solution is {}", solution),
+        Ok(solution) => println!("Solution is \n{}", solution),
         Err(error) => eprintln!("Error solution was not found with error :\n\t{}", error),
     }
 }
@@ -15,16 +15,15 @@ pub enum Part {
 }
 
 pub fn valid_day(day: &str) -> anyhow::Result<usize> {
-    if let Some(number) = day.strip_prefix("day") {
-        if let Ok(number) = usize::from_str_radix(number, 10) {
-            return match number {
-                1..=25 => Ok(number),
-                e => Err(anyhow::Error::msg(format!(
-                    "Not a valid day number (1-25) : {}",
-                    e
-                ))),
-            };
-        }
+    let number=day.strip_prefix("day").unwrap_or(day);
+    if let Ok(number) = usize::from_str_radix(number, 10) {
+        return match number {
+            1..=25 => Ok(number),
+            e => Err(anyhow::Error::msg(format!(
+                "Not a valid day number (1-25) : {}",
+                e
+            ))),
+        };
     }
     Err(anyhow::Error::msg(format!(
         "Not a valid day format dayX (X:1-25) : {}",

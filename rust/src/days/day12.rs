@@ -98,8 +98,7 @@ fn graph_traversal<const LIMIT: u8, const CHECK: bool>(
     }
     let mut sum = 0;
     for next in next_ones {
-        let current =
-            graph_traversal::<LIMIT, CHECK>(next, links, tracked_path.clone())?;
+        let current = graph_traversal::<LIMIT, CHECK>(next, links, tracked_path.clone())?;
         sum += current;
     }
     return Ok(sum);
