@@ -15,7 +15,7 @@ pub enum Part {
 }
 
 pub fn valid_day(day: &str) -> anyhow::Result<usize> {
-    let number=day.strip_prefix("day").unwrap_or(day);
+    let number = day.strip_prefix("day").unwrap_or(day);
     if let Ok(number) = usize::from_str_radix(number, 10) {
         return match number {
             1..=25 => Ok(number),

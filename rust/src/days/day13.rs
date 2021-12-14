@@ -69,7 +69,11 @@ fn min_max(points: &Vec<(usize, usize)>) -> ((usize, usize), (usize, usize)) {
 }
 
 impl Fold {
-    fn fold(&self, points: &mut Vec<(usize, usize)>, (min, mut max): ((usize, usize), (usize, usize))) -> anyhow::Result<(usize, usize)> {
+    fn fold(
+        &self,
+        points: &mut Vec<(usize, usize)>,
+        (min, mut max): ((usize, usize), (usize, usize)),
+    ) -> anyhow::Result<(usize, usize)> {
         match self {
             Fold::XAxis(fold) => {
                 if *fold < (max.0 - min.0) / 2 {
@@ -81,9 +85,7 @@ impl Fold {
                     if *x > *fold {
                         *x = 2 * (*fold) - *x;
                     } else if *x == *fold {
-                        return Err(anyhow::Error::msg(
-                            "You can not fold onto itself",
-                        ));
+                        return Err(anyhow::Error::msg("You can not fold onto itself"));
                     }
                 }
                 max.0 = *fold - 1;
@@ -98,9 +100,7 @@ impl Fold {
                     if *y > *fold {
                         *y = 2 * (*fold) - *y;
                     } else if *y == *fold {
-                        return Err(anyhow::Error::msg(
-                            "You can not fold onto itself",
-                        ));
+                        return Err(anyhow::Error::msg("You can not fold onto itself"));
                     }
                 }
                 max.1 = *fold - 1;
@@ -139,17 +139,17 @@ impl Solution2 for Day13 {
     fn run_solution2(&self, lines: Vec<String>) -> anyhow::Result<String> {
         let (mut points, folds) = parse(lines)?;
         let (min, mut max) = min_max(&points);
-        for fold in &folds{
+        for fold in &folds {
             max = fold.fold(&mut points, (min, max))?;
             points.sort();
             points.dedup();
         }
-        let mut s =String::with_capacity((max.1-min.1)*((max.0-min.0)+1));
+        let mut s = String::with_capacity((max.1 - min.1) * ((max.0 - min.0) + 1));
         for y in min.1..=max.1 {
             for x in min.0..=max.0 {
-                if points.contains(&(x,y)){
+                if points.contains(&(x, y)) {
                     s.push('#');
-                }else{
+                } else {
                     s.push('.');
                 }
             }
