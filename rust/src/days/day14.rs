@@ -1,4 +1,4 @@
-use aoc_2021::{Day, Solution1, Solution2};
+use aoc_2021::{Day, Pos, Solution1, Solution2};
 use std::collections::{HashMap, VecDeque};
 
 #[derive(Default)]
@@ -68,7 +68,7 @@ fn dumb_process_polymer(
     Ok(new)
 }
 
-fn min_max(mut v: Vec<char>) -> anyhow::Result<(usize, usize)> {
+fn min_max(mut v: Vec<char>) -> anyhow::Result<Pos> {
     v.sort();
     let mut maxi = 0;
     let mut mini = usize::MAX;
@@ -92,7 +92,7 @@ fn min_max(mut v: Vec<char>) -> anyhow::Result<(usize, usize)> {
             break;
         }
     }
-    Ok((mini, maxi))
+    Ok(Pos::new(mini, maxi))
 }
 
 impl Solution1 for Day14 {
@@ -102,8 +102,8 @@ impl Solution1 for Day14 {
         for _ in 0..10 {
             chars = dumb_process_polymer(chars, &pairs)?;
         }
-        let (mini, maxi) = min_max(chars)?;
-        Ok((maxi - mini).to_string())
+        let pos = min_max(chars)?;
+        Ok((pos.y() - pos.x()).to_string())
     }
 }
 
@@ -223,26 +223,38 @@ mod test {
     use aoc_2021::Part::{Part1, Part2, Test};
 
     #[test]
-    fn solution1() {
+    fn solution1() -> anyhow::Result<()> {
         let lines: Vec<String> = collect_file(Part1, "Day14").unwrap();
-        let _ = dbg!(Day14::default().run_solution1(lines));
+        Ok(assert_eq!(
+            Day14::default().run_solution1(lines)?,
+            String::from("2010")
+        ))
     }
 
     #[test]
-    fn test_solution1() {
+    fn test_solution1() -> anyhow::Result<()> {
         let lines: Vec<String> = collect_file(Test, "Day14").unwrap();
-        let _ = dbg!(Day14::default().run_solution1(lines));
+        Ok(assert_eq!(
+            Day14::default().run_solution1(lines)?,
+            String::from("1588")
+        ))
     }
 
     #[test]
-    fn solution2() {
+    fn solution2() -> anyhow::Result<()> {
         let lines: Vec<String> = collect_file(Part2, "Day14").unwrap();
-        let _ = dbg!(Day14::default().run_solution2(lines));
+        Ok(assert_eq!(
+            Day14::default().run_solution2(lines)?,
+            String::from("2437698971143")
+        ))
     }
 
     #[test]
-    fn test_solution2() {
+    fn test_solution2() -> anyhow::Result<()> {
         let lines: Vec<String> = collect_file(Test, "Day14").unwrap();
-        let _ = dbg!(Day14::default().run_solution2(lines));
+        Ok(assert_eq!(
+            Day14::default().run_solution2(lines)?,
+            String::from("2188189693529")
+        ))
     }
 }

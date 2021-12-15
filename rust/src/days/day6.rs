@@ -59,26 +59,38 @@ mod test {
     use aoc_2021::Part::{Part1, Part2, Test};
 
     #[test]
-    fn solution1() {
+    fn solution1() -> anyhow::Result<()> {
         let lines: Vec<String> = collect_file(Part1, "Day6").unwrap();
-        let _ = dbg!(Day6::default().run_solution1(lines));
+        Ok(assert_eq!(
+            Day6::default().run_solution1(lines)?,
+            String::from("393019")
+        ))
     }
 
     #[test]
-    fn test_solution1() {
+    fn test_solution1() -> anyhow::Result<()> {
         let lines: Vec<String> = collect_file(Test, "Day6").unwrap();
-        let _ = dbg!(Day6::default().run_solution1(lines));
+        Ok(assert_eq!(
+            Day6::default().run_solution1(lines)?,
+            String::from("5934")
+        ))
     }
 
     #[test]
-    fn solution2() {
+    fn solution2() -> anyhow::Result<()> {
         let lines: Vec<String> = collect_file(Part2, "Day6").unwrap();
-        let _ = dbg!(Day6::default().run_solution2(lines));
+        Ok(assert_eq!(
+            Day6::default().run_solution2(lines)?,
+            String::from("1757714216975")
+        ))
     }
 
     #[test]
-    fn test_solution2() {
+    fn test_solution2() -> anyhow::Result<()> {
         let lines: Vec<String> = collect_file(Test, "Day6").unwrap();
-        let _ = dbg!(Day6::default().run_solution2(lines));
+        Ok(assert_eq!(
+            Day6::default().run_solution2(lines)?,
+            String::from("26984457539")
+        ))
     }
 }

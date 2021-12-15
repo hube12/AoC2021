@@ -1,4 +1,4 @@
-use aoc_2021::{Day, Solution1, Solution2};
+use aoc_2021::{Day, Pos, Solution1, Solution2};
 
 #[derive(Default)]
 pub struct Day4;
@@ -11,7 +11,7 @@ use std::collections::{HashMap, HashSet};
 #[derive(Debug)]
 pub struct Board {
     /// represents value in (col,row)
-    map: HashMap<usize, Vec<(usize, usize)>>,
+    map: HashMap<usize, Vec<Pos>>,
     /// Marked number in each row
     rows: Vec<usize>,
     /// Marked number in each row
@@ -37,10 +37,10 @@ impl Board {
             let number = usize::from_str_radix(number, 10)?;
             match self.map.entry(number) {
                 Entry::Occupied(mut e) => {
-                    e.get_mut().push((col, row));
+                    e.get_mut().push(Pos::new(col, row));
                 }
                 Entry::Vacant(e) => {
-                    e.insert(vec![(col, row)]);
+                    e.insert(vec![Pos::new(col, row)]);
                 }
             }
         }
@@ -52,9 +52,9 @@ impl Board {
             return;
         }
         if let Some(positions) = self.map.get(&number) {
-            for (row, col) in positions {
-                self.rows[*row] -= 1;
-                self.cols[*col] -= 1;
+            for pos in positions {
+                self.rows[pos.x()] -= 1;
+                self.cols[pos.y()] -= 1;
             }
             self.marked.insert(number);
         }
@@ -157,26 +157,38 @@ mod test {
     use aoc_2021::Part::{Part1, Part2, Test};
 
     #[test]
-    fn solution1() {
+    fn solution1() -> anyhow::Result<()> {
         let lines: Vec<String> = collect_file(Part1, "Day4").unwrap();
-        let _ = dbg!(Day4::default().run_solution1(lines));
+        Ok(assert_eq!(
+            Day4::default().run_solution1(lines)?,
+            String::from("16716")
+        ))
     }
 
     #[test]
-    fn test_solution1() {
+    fn test_solution1() -> anyhow::Result<()> {
         let lines: Vec<String> = collect_file(Test, "Day4").unwrap();
-        let _ = dbg!(Day4::default().run_solution1(lines));
+        Ok(assert_eq!(
+            Day4::default().run_solution1(lines)?,
+            String::from("4512")
+        ))
     }
 
     #[test]
-    fn solution2() {
+    fn solution2() -> anyhow::Result<()> {
         let lines: Vec<String> = collect_file(Part2, "Day4").unwrap();
-        let _ = dbg!(Day4::default().run_solution2(lines));
+        Ok(assert_eq!(
+            Day4::default().run_solution2(lines)?,
+            String::from("4880")
+        ))
     }
 
     #[test]
-    fn test_solution2() {
+    fn test_solution2() -> anyhow::Result<()> {
         let lines: Vec<String> = collect_file(Test, "Day4").unwrap();
-        let _ = dbg!(Day4::default().run_solution2(lines));
+        Ok(assert_eq!(
+            Day4::default().run_solution2(lines)?,
+            String::from("1924")
+        ))
     }
 }

@@ -183,27 +183,39 @@ mod test {
     use aoc_2021::Part::{Part1, Part2, Test};
 
     #[test]
-    fn solution1() {
+    fn solution1() -> anyhow::Result<()> {
         let lines: Vec<String> = collect_file(Part1, "Day7").unwrap();
-        let _ = dbg!(Day7::default().run_solution1(lines));
+        Ok(assert_eq!(
+            Day7::default().run_solution1(lines)?,
+            String::from("343468")
+        ))
     }
 
     #[test]
-    fn test_solution1() {
+    fn test_solution1() -> anyhow::Result<()> {
         let lines: Vec<String> = collect_file(Test, "Day7").unwrap();
-        let _ = dbg!(Day7::default().run_solution1(lines));
+        Ok(assert_eq!(
+            Day7::default().run_solution1(lines)?,
+            String::from("37")
+        ))
     }
 
     #[test]
-    fn solution2() {
+    fn solution2() -> anyhow::Result<()> {
         let lines: Vec<String> = collect_file(Part2, "Day7").unwrap();
-        let _ = dbg!(Day7::default().run_solution2(lines));
+        Ok(assert_eq!(
+            Day7::default().run_solution2(lines)?,
+            String::from("96086265")
+        ))
     }
 
     #[test]
-    fn test_solution2() {
+    fn test_solution2() -> anyhow::Result<()> {
         let lines: Vec<String> = collect_file(Test, "Day7").unwrap();
-        let _ = dbg!(Day7::default().run_solution2(lines));
+        Ok(assert_eq!(
+            Day7::default().run_solution2(lines)?,
+            String::from("168")
+        ))
     }
 
     #[test]

@@ -1,4 +1,4 @@
-use aoc_2021::{Day, Solution1, Solution2};
+use aoc_2021::{Day, Pos, Solution1, Solution2};
 
 #[derive(Default)]
 pub struct Day5;
@@ -12,12 +12,9 @@ use std::collections::HashMap;
 
 fn compute_on_map(
     lines: Vec<String>,
-    compute: impl for<'a> Fn(
-        ((usize, usize), (usize, usize)),
-        Box<dyn FnMut(usize, usize) + 'a>,
-    ) -> anyhow::Result<()>,
+    compute: impl for<'a> Fn((Pos, Pos), Box<dyn FnMut(Pos) + 'a>) -> anyhow::Result<()>,
 ) -> anyhow::Result<String> {
-    let mut map: HashMap<(usize, usize), usize> = HashMap::with_capacity(lines.len());
+    let mut map: HashMap<Pos, usize> = HashMap::with_capacity(lines.len());
     lines
         .iter()
         .map(|x| {
@@ -37,11 +34,12 @@ fn compute_on_map(
         })
         .map(|r| {
             r.and_then(|((start_x, start_y), (end_x, end_y))| {
-                let a = usize::from_str_radix(start_x, 10).and_then(|min_x| {
-                    usize::from_str_radix(start_y, 10).and_then(|min_y| Ok((min_x, min_y)))
+                let a = usize::from_str_radix(start_x, 10).and_then(|start_x| {
+                    usize::from_str_radix(start_y, 10)
+                        .and_then(|start_y| Ok(Pos::new(start_x, start_y)))
                 });
-                let b = usize::from_str_radix(end_x, 10).and_then(|min_x| {
-                    usize::from_str_radix(end_y, 10).and_then(|min_y| Ok((min_x, min_y)))
+                let b = usize::from_str_radix(end_x, 10).and_then(|end_x| {
+                    usize::from_str_radix(end_y, 10).and_then(|end_y| Ok(Pos::new(end_x, end_y)))
                 });
                 Ok(a.and_then(|x| b.and_then(|y| Ok((x, y)))))
             })
@@ -59,19 +57,19 @@ fn compute_on_map(
     Ok(map.values().filter(|&x| *x > 1).count().to_string())
 }
 
-fn update_map(map: &mut HashMap<(usize, usize), usize>) -> impl FnMut(usize, usize) + '_ {
-    move |x: usize, y: usize| {
-        map.entry((x, y)).and_modify(|v| *v += 1).or_insert(1);
+fn update_map(map: &mut HashMap<Pos, usize>) -> impl FnMut(Pos) + '_ {
+    move |pos| {
+        map.entry(pos).and_modify(|v| *v += 1).or_insert(1);
     }
 }
 
 impl Solution1 for Day5 {
     fn run_solution1(&self, lines: Vec<String>) -> anyhow::Result<String> {
-        compute_on_map(lines, |((min_x, min_y), (max_x, max_y)), mut map| {
-            if min_x == max_x || min_y == max_y {
-                for x in min(min_x, max_x)..=max(min_x, max_x) {
-                    for y in min(min_y, max_y)..=max(min_y, max_y) {
-                        map(x, y);
+        compute_on_map(lines, |(min_pos, max_pos), mut map| {
+            if min_pos.x() == max_pos.x() || min_pos.y() == max_pos.y() {
+                for x in min(min_pos.x(), max_pos.x())..=max(min_pos.x(), max_pos.x()) {
+                    for y in min(min_pos.y(), max_pos.y())..=max(min_pos.y(), max_pos.y()) {
+                        map(Pos::new(x, y));
                     }
                 }
             }
@@ -82,32 +80,37 @@ impl Solution1 for Day5 {
 
 impl Solution2 for Day5 {
     fn run_solution2(&self, lines: Vec<String>) -> anyhow::Result<String> {
-        compute_on_map(lines, |((min_x, min_y), (max_x, max_y)), mut map| {
-            if min_x == max_x || min_y == max_y {
-                //dbg!(((min_x, min_y), (max_x, max_y)));
-                for x in min(min_x, max_x)..=max(min_x, max_x) {
-                    for y in min(min_y, max_y)..=max(min_y, max_y) {
-                        map(x, y)
+        compute_on_map(lines, |(min_pos, max_pos), mut map| {
+            if min_pos.x() == max_pos.x() || min_pos.y() == max_pos.y() {
+                //dbg!(((min_pos.x(), min_pos.y()), (max_pos.x(), max_pos.y())));
+                for x in min(min_pos.x(), max_pos.x())..=max(min_pos.x(), max_pos.x()) {
+                    for y in min(min_pos.y(), max_pos.y())..=max(min_pos.y(), max_pos.y()) {
+                        map(Pos::new(x, y))
                     }
                 }
-            } else if abs(min_x as isize - max_x as isize) == abs(min_y as isize - max_y as isize) {
+            } else if abs(min_pos.x() as isize - max_pos.x() as isize)
+                == abs(min_pos.y() as isize - max_pos.y() as isize)
+            {
                 let mut x_range: Box<dyn DoubleEndedIterator<Item = usize>> =
-                    Box::new(min_x..=max_x);
-                if min_x > max_x {
-                    x_range = Box::new((max_x..=min_x).rev());
+                    Box::new(min_pos.x()..=max_pos.x());
+                if min_pos.x() > max_pos.x() {
+                    x_range = Box::new((max_pos.x()..=min_pos.x()).rev());
                 }
                 let mut y_range: Box<dyn DoubleEndedIterator<Item = usize>> =
-                    Box::new(min_y..=max_y);
-                if min_y > max_y {
-                    y_range = Box::new((max_y..=min_y).rev());
+                    Box::new(min_pos.y()..=max_pos.y());
+                if min_pos.y() > max_pos.y() {
+                    y_range = Box::new((max_pos.y()..=min_pos.y()).rev());
                 }
                 while let (Some(x), Some(y)) = (x_range.next(), y_range.next()) {
-                    map(x, y)
+                    map(Pos::new(x, y))
                 }
                 if x_range.next().is_some() || y_range.next().is_some() {
                     return Err(anyhow::Error::msg(format!(
                         "Diagonal was not correct for {}:{} {}:{}",
-                        min_x, max_x, min_y, max_y
+                        min_pos.x(),
+                        max_pos.x(),
+                        min_pos.y(),
+                        max_pos.y()
                     )));
                 }
             }
@@ -123,26 +126,38 @@ mod test {
     use aoc_2021::Part::{Part1, Part2, Test};
 
     #[test]
-    fn solution1() {
+    fn solution1() -> anyhow::Result<()> {
         let lines: Vec<String> = collect_file(Part1, "Day5").unwrap();
-        let _ = dbg!(Day5::default().run_solution1(lines));
+        Ok(assert_eq!(
+            Day5::default().run_solution1(lines)?,
+            String::from("5442")
+        ))
     }
 
     #[test]
-    fn test_solution1() {
+    fn test_solution1() -> anyhow::Result<()> {
         let lines: Vec<String> = collect_file(Test, "Day5").unwrap();
-        let _ = dbg!(Day5::default().run_solution1(lines));
+        Ok(assert_eq!(
+            Day5::default().run_solution1(lines)?,
+            String::from("5")
+        ))
     }
 
     #[test]
-    fn solution2() {
+    fn solution2() -> anyhow::Result<()> {
         let lines: Vec<String> = collect_file(Part2, "Day5").unwrap();
-        let _ = dbg!(Day5::default().run_solution2(lines));
+        Ok(assert_eq!(
+            Day5::default().run_solution2(lines)?,
+            String::from("19571")
+        ))
     }
 
     #[test]
-    fn test_solution2() {
+    fn test_solution2() -> anyhow::Result<()> {
         let lines: Vec<String> = collect_file(Test, "Day5").unwrap();
-        let _ = dbg!(Day5::default().run_solution2(lines));
+        Ok(assert_eq!(
+            Day5::default().run_solution2(lines)?,
+            String::from("12")
+        ))
     }
 }

@@ -1,4 +1,4 @@
-use aoc_2021::{Day, Solution1, Solution2};
+use aoc_2021::{Day, Pos, Solution1, Solution2};
 use std::convert::TryFrom;
 
 use anyhow::anyhow;
@@ -28,9 +28,9 @@ impl TryFrom<&String> for Fold {
     }
 }
 
-fn parse(lines: Vec<String>) -> anyhow::Result<(Vec<(usize, usize)>, Vec<Fold>)> {
+fn parse(lines: Vec<String>) -> anyhow::Result<(Vec<Pos>, Vec<Fold>)> {
     let mut iter = lines.iter();
-    let points: Vec<(usize, usize)> = iter
+    let points: Vec<Pos> = iter
         .by_ref()
         .take_while(|x| !x.is_empty())
         .map(|x| {
@@ -40,7 +40,7 @@ fn parse(lines: Vec<String>) -> anyhow::Result<(Vec<(usize, usize)>, Vec<Fold>)>
         .map(|x| {
             x.and_then(|(x, y)| {
                 usize::from_str_radix(x, 10)
-                    .and_then(|x| usize::from_str_radix(y, 10).and_then(|y| Ok((x, y))))
+                    .and_then(|x| usize::from_str_radix(y, 10).and_then(|y| Ok(Pos::new(x, y))))
                     .map_err(|x| anyhow!(x))
             })
         })
@@ -49,61 +49,57 @@ fn parse(lines: Vec<String>) -> anyhow::Result<(Vec<(usize, usize)>, Vec<Fold>)>
     Ok((points, folds))
 }
 
-fn min_max(points: &Vec<(usize, usize)>) -> ((usize, usize), (usize, usize)) {
+fn min_max(points: &Vec<Pos>) -> (Pos, Pos) {
     let (mut min_x, mut min_y, mut max_x, mut max_y) = (usize::MAX, usize::MAX, 0usize, 0usize);
-    for (x, y) in points {
-        if *x < min_x {
-            min_x = *x;
+    for point in points {
+        if point.x() < min_x {
+            min_x = point.x();
         }
-        if *y < min_y {
-            min_y = *y;
+        if point.y() < min_y {
+            min_y = point.y();
         }
-        if *x > max_x {
-            max_x = *x;
+        if point.x() > max_x {
+            max_x = point.x();
         }
-        if *y > max_y {
-            max_y = *y;
+        if point.y() > max_y {
+            max_y = point.y();
         }
     }
-    ((min_x, min_y), (max_x, max_y))
+    (Pos::new(min_x, min_y), Pos::new(max_x, max_y))
 }
 
 impl Fold {
-    fn fold(
-        &self,
-        points: &mut Vec<(usize, usize)>,
-        (min, mut max): ((usize, usize), (usize, usize)),
-    ) -> anyhow::Result<(usize, usize)> {
+    fn fold(&self, points: &mut Vec<Pos>, (min, mut max): (Pos, Pos)) -> anyhow::Result<Pos> {
         match self {
             Fold::XAxis(fold) => {
-                if *fold < (max.0 - min.0) / 2 {
+                if *fold < (max.x() - min.x()) / 2 {
                     return Err(anyhow::Error::msg(
                         "This fold will bring more elements onto the smaller grid.",
                     ));
                 }
-                for (x, _) in points {
-                    if *x > *fold {
-                        *x = 2 * (*fold) - *x;
-                    } else if *x == *fold {
+                for point in points {
+                    if point.x() > *fold {
+                        point.set_x((*fold << 1) - point.x());
+                    } else if point.x() == *fold {
                         return Err(anyhow::Error::msg("You can not fold onto itself"));
                     }
                 }
-                max.0 = *fold - 1;
+                max.set_x(*fold - 1);
             }
             Fold::YAxis(fold) => {
-                if *fold < (max.1 - min.1) / 2 {
+                if *fold < (max.y() - min.y()) / 2 {
                     return Err(anyhow::Error::msg(
                         "This fold will bring more elements onto the smaller grid.",
                     ));
                 }
-                for (_, y) in points {
-                    if *y > *fold {
-                        *y = 2 * (*fold) - *y;
-                    } else if *y == *fold {
+                for point in points {
+                    if point.y() > *fold {
+                        point.set_y((*fold << 1) - point.y());
+                    } else if point.y() == *fold {
                         return Err(anyhow::Error::msg("You can not fold onto itself"));
                     }
                 }
-                max.1 = *fold - 1;
+                max.set_y(*fold - 1);
             }
         }
         Ok(max)
@@ -144,10 +140,10 @@ impl Solution2 for Day13 {
             points.sort();
             points.dedup();
         }
-        let mut s = String::with_capacity((max.1 - min.1) * ((max.0 - min.0) + 1));
-        for y in min.1..=max.1 {
-            for x in min.0..=max.0 {
-                if points.contains(&(x, y)) {
+        let mut s = String::with_capacity((max.y() - min.y()) * ((max.x() - min.x()) + 1));
+        for y in min.y()..=max.y() {
+            for x in min.x()..=max.x() {
+                if points.contains(&Pos::new(x, y)) {
                     s.push('#');
                 } else {
                     s.push('.');
@@ -167,26 +163,57 @@ mod test {
     use aoc_2021::Part::{Part1, Part2, Test};
 
     #[test]
-    fn solution1() {
+    fn solution1() -> anyhow::Result<()> {
         let lines: Vec<String> = collect_file(Part1, "Day13").unwrap();
-        let _ = dbg!(Day13::default().run_solution1(lines));
+        Ok(assert_eq!(
+            Day13::default().run_solution1(lines)?,
+            String::from("729")
+        ))
     }
 
     #[test]
-    fn test_solution1() {
+    fn test_solution1() -> anyhow::Result<()> {
         let lines: Vec<String> = collect_file(Test, "Day13").unwrap();
-        let _ = dbg!(Day13::default().run_solution1(lines));
+        Ok(assert_eq!(
+            Day13::default().run_solution1(lines)?,
+            String::from("17")
+        ))
     }
 
     #[test]
-    fn solution2() {
+    fn solution2() -> anyhow::Result<()> {
         let lines: Vec<String> = collect_file(Part2, "Day13").unwrap();
-        let _ = dbg!(Day13::default().run_solution2(lines));
+        Ok(assert_eq!(
+            Day13::default().run_solution2(lines)?,
+            String::from(
+                "\
+                ###...##..####.#....###..#..#.####.###..\n\
+                #..#.#..#....#.#....#..#.#..#.#....#..#.\n\
+                #..#.#......#..#....###..####.###..#..#.\n\
+                ###..#.##..#...#....#..#.#..#.#....###..\n\
+                #.#..#..#.#....#....#..#.#..#.#....#....\n\
+                #..#..###.####.####.###..#..#.#....#....\n\
+                "
+            )
+        ))
     }
 
     #[test]
-    fn test_solution2() {
+    fn test_solution2() -> anyhow::Result<()> {
         let lines: Vec<String> = collect_file(Test, "Day13").unwrap();
-        let _ = dbg!(Day13::default().run_solution2(lines));
+        Ok(assert_eq!(
+            Day13::default().run_solution2(lines)?,
+            String::from(
+                "\
+            #####\n\
+            #...#\n\
+            #...#\n\
+            #...#\n\
+            #####\n\
+            .....\n\
+            .....\n\
+            "
+            )
+        ))
     }
 }
