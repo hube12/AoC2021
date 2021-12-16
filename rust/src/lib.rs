@@ -168,10 +168,3 @@ pub trait Solution2 {
 }
 
 pub trait Day: Solution1 + Solution2 {}
-
-#[test]
-fn test() {
-    let r = valid_day("day1");
-    assert!(r.is_ok());
-    assert_eq!(r.unwrap(), 1);
-}

@@ -1,4 +1,4 @@
-use aoc_2021::{Day, Pos, Solution1, Solution2, get_adjacent_positions,CROSS};
+use aoc_2021::{get_adjacent_positions, Day, Pos, Solution1, Solution2, CROSS};
 use std::collections::HashSet;
 
 #[derive(Default)]
@@ -92,10 +92,10 @@ fn recursive_flow(
     length: usize,
     matrix: &Vec<Vec<u32>>,
     acc: &mut HashSet<Pos>,
-) -> anyhow::Result<()>{
+) -> anyhow::Result<()> {
     let value = matrix[pos.y()][pos.x()];
     if value == 9 || acc.contains(&pos) {
-        return  Ok(());
+        return Ok(());
     } else {
         acc.insert(pos);
     }

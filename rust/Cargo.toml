@@ -24,9 +24,13 @@ name="playground"
 [dependencies]
 anyhow = "1.0.51"
 num-traits = "0.2.14"
+log = "0.4.14"
 
 [profile.dev]
-opt-level = 3
+debug = true
 
 [profile.release]
-opt-level = 3
+debug = true
+
+[profile.bench]
+debug = true

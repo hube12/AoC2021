@@ -1,6 +1,6 @@
-use aoc_2021::{Day, Pos, Solution1, Solution2, get_adjacent_positions, CROSS};
-use std::collections::{HashMap, BinaryHeap};
-use std::cmp::{ Ordering, max};
+use aoc_2021::{get_adjacent_positions, Day, Pos, Solution1, Solution2, CROSS};
+use std::cmp::{max, Ordering};
+use std::collections::{BinaryHeap, HashMap};
 
 #[derive(Default)]
 pub struct Day15;
@@ -30,8 +30,7 @@ struct State<'a>(&'a Pos, usize);
 
 impl Ord for State<'_> {
     fn cmp(&self, other: &Self) -> Ordering {
-        other.1.cmp(&self.1)
-            .then_with(|| self.0.cmp(&other.0))
+        other.1.cmp(&self.1).then_with(|| self.0.cmp(&other.0))
     }
 }
 
@@ -93,12 +92,13 @@ impl Solution1 for Day15 {
         let start = Pos::new(0, 0);
         let destination = Pos::new(length - 1, height - 1);
 
-        let min_cost = find_min_cost(&start, &destination, &graph).ok_or(anyhow::Error::msg("Can not compute cost"))?;
+        let min_cost = find_min_cost(&start, &destination, &graph)
+            .ok_or(anyhow::Error::msg("Can not compute cost"))?;
         Ok(min_cost.to_string())
     }
 }
 
-fn copy_5x5(matrix:Vec<Vec<u32>>) -> anyhow::Result<(Vec<Vec<u32>>,usize,usize)> {
+fn copy_5x5(matrix: Vec<Vec<u32>>) -> anyhow::Result<(Vec<Vec<u32>>, usize, usize)> {
     let length = matrix
         .first()
         .ok_or(anyhow::Error::msg("Need one line"))?
@@ -127,7 +127,8 @@ fn copy_5x5(matrix:Vec<Vec<u32>>) -> anyhow::Result<(Vec<Vec<u32>>,usize,usize)>
             let x_offset = x_copy * length;
             for y in 0..height {
                 for x in 0..length {
-                    full_cave[y + y_offset][x + x_offset] = max(1, (full_cave[y + y_idx][x] + 1) % 10);
+                    full_cave[y + y_offset][x + x_offset] =
+                        max(1, (full_cave[y + y_idx][x] + 1) % 10);
                 }
             }
         }
@@ -144,12 +145,13 @@ fn copy_5x5(matrix:Vec<Vec<u32>>) -> anyhow::Result<(Vec<Vec<u32>>,usize,usize)>
             let x_idx = (x_copy - 1) * length;
             for y in 0..height {
                 for x in 0..length {
-                    full_cave[y + y_offset][x + x_offset] = max(1, (full_cave[y + y_idx][x+x_idx] + 1) % 10);
+                    full_cave[y + y_offset][x + x_offset] =
+                        max(1, (full_cave[y + y_idx][x + x_idx] + 1) % 10);
                 }
             }
         }
     }
-    Ok((full_cave,height*5,length*5))
+    Ok((full_cave, height * 5, length * 5))
 }
 
 impl Solution2 for Day15 {
@@ -165,11 +167,12 @@ impl Solution2 for Day15 {
                     .collect::<Result<_, _>>()
             })
             .collect::<Result<_, _>>()?;
-        let (full_cave,height,length)=copy_5x5(matrix)?;
+        let (full_cave, height, length) = copy_5x5(matrix)?;
         let start = Pos::new(0, 0);
         let destination = Pos::new(length - 1, height - 1);
-        let graph=make_graph(full_cave,length,height)?;
-        let min_cost = find_min_cost(&start, &destination, &graph).ok_or(anyhow::Error::msg("Can not compute cost"))?;
+        let graph = make_graph(full_cave, length, height)?;
+        let min_cost = find_min_cost(&start, &destination, &graph)
+            .ok_or(anyhow::Error::msg("Can not compute cost"))?;
         Ok(min_cost.to_string())
     }
 }
