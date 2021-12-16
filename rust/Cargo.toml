@@ -16,10 +16,6 @@ name="aoc_2021"
 [[bin]]
 path="src/runner.rs"
 name="run"
-[[bin]]
-path="src/playground.rs"
-name="playground"
-
 
 [dependencies]
 anyhow = "1.0.51"

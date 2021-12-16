@@ -21,6 +21,7 @@ fn match_day(x: usize) -> Box<dyn Day> {
         13 => Box::from(Day13),
         14 => Box::from(Day14),
         15 => Box::from(Day15),
+        16 => Box::from(Day16),
         _ => unimplemented!("Missing day"),
     }
 }

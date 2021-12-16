@@ -144,7 +144,7 @@ fn parse_number<const N: usize>(iter: &mut Chars) -> anyhow::Result<usize> {
 }
 
 fn parse_literal(iter: &mut Chars) -> anyhow::Result<(usize, usize)> {
-    let mut final_number = String::with_capacity(100);
+    let mut final_number:usize=0;
     let mut size = 0;
     loop {
         let not_last_group = iter
@@ -152,12 +152,13 @@ fn parse_literal(iter: &mut Chars) -> anyhow::Result<(usize, usize)> {
             .ok_or(anyhow::Error::msg("Missing char for last group"))?;
         let number = parse_number::<4>(iter)?;
         size += 5;
-        final_number.push_str(&*format!("{:x}", number));
+        final_number+=number;
         match not_last_group {
             '0' => {
                 break;
             }
             '1' => {
+                final_number*=16;
                 continue;
             }
             _ => {
@@ -165,7 +166,7 @@ fn parse_literal(iter: &mut Chars) -> anyhow::Result<(usize, usize)> {
             }
         }
     }
-    Ok((usize::from_str_radix(final_number.as_str(), 16)?, size))
+    Ok((final_number, size))
 }
 
 fn parse_packet<const REDUCE:bool>(iter: &mut Chars, deep: usize) -> anyhow::Result<(Vec<Packet>, usize)> {
