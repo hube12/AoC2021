@@ -1,4 +1,4 @@
-use aoc_2021::{Day, Pos, Solution1, Solution2};
+use aoc_2021::{Day, UPos, Solution1, Solution2};
 
 #[derive(Default)]
 pub struct Day5;
@@ -12,9 +12,9 @@ use std::collections::HashMap;
 
 fn compute_on_map(
     lines: Vec<String>,
-    compute: impl for<'a> Fn((Pos, Pos), Box<dyn FnMut(Pos) + 'a>) -> anyhow::Result<()>,
+    compute: impl for<'a> Fn((UPos, UPos), Box<dyn FnMut(UPos) + 'a>) -> anyhow::Result<()>,
 ) -> anyhow::Result<String> {
-    let mut map: HashMap<Pos, usize> = HashMap::with_capacity(lines.len());
+    let mut map: HashMap<UPos, usize> = HashMap::with_capacity(lines.len());
     lines
         .iter()
         .map(|x| {
@@ -36,10 +36,10 @@ fn compute_on_map(
             r.and_then(|((start_x, start_y), (end_x, end_y))| {
                 let a = usize::from_str_radix(start_x, 10).and_then(|start_x| {
                     usize::from_str_radix(start_y, 10)
-                        .and_then(|start_y| Ok(Pos::new(start_x, start_y)))
+                        .and_then(|start_y| Ok(UPos::new(start_x, start_y)))
                 });
                 let b = usize::from_str_radix(end_x, 10).and_then(|end_x| {
-                    usize::from_str_radix(end_y, 10).and_then(|end_y| Ok(Pos::new(end_x, end_y)))
+                    usize::from_str_radix(end_y, 10).and_then(|end_y| Ok(UPos::new(end_x, end_y)))
                 });
                 Ok(a.and_then(|x| b.and_then(|y| Ok((x, y)))))
             })
@@ -57,7 +57,7 @@ fn compute_on_map(
     Ok(map.values().filter(|&x| *x > 1).count().to_string())
 }
 
-fn update_map(map: &mut HashMap<Pos, usize>) -> impl FnMut(Pos) + '_ {
+fn update_map(map: &mut HashMap<UPos, usize>) -> impl FnMut(UPos) + '_ {
     move |pos| {
         map.entry(pos).and_modify(|v| *v += 1).or_insert(1);
     }
@@ -69,7 +69,7 @@ impl Solution1 for Day5 {
             if min_pos.x() == max_pos.x() || min_pos.y() == max_pos.y() {
                 for x in min(min_pos.x(), max_pos.x())..=max(min_pos.x(), max_pos.x()) {
                     for y in min(min_pos.y(), max_pos.y())..=max(min_pos.y(), max_pos.y()) {
-                        map(Pos::new(x, y));
+                        map(UPos::new(x, y));
                     }
                 }
             }
@@ -85,7 +85,7 @@ impl Solution2 for Day5 {
                 //dbg!(((min_pos.x(), min_pos.y()), (max_pos.x(), max_pos.y())));
                 for x in min(min_pos.x(), max_pos.x())..=max(min_pos.x(), max_pos.x()) {
                     for y in min(min_pos.y(), max_pos.y())..=max(min_pos.y(), max_pos.y()) {
-                        map(Pos::new(x, y))
+                        map(UPos::new(x, y))
                     }
                 }
             } else if abs(min_pos.x() as isize - max_pos.x() as isize)
@@ -102,7 +102,7 @@ impl Solution2 for Day5 {
                     y_range = Box::new((max_pos.y()..=min_pos.y()).rev());
                 }
                 while let (Some(x), Some(y)) = (x_range.next(), y_range.next()) {
-                    map(Pos::new(x, y))
+                    map(UPos::new(x, y))
                 }
                 if x_range.next().is_some() || y_range.next().is_some() {
                     return Err(anyhow::Error::msg(format!(

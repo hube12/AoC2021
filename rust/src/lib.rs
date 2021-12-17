@@ -1,5 +1,8 @@
 use num_traits::Num;
-
+use std::convert::TryFrom;
+use std::fmt::Debug;
+use std::hash::Hash;
+use anyhow::anyhow;
 pub fn handle_solution<T: std::fmt::Display>(solution: anyhow::Result<T>) {
     match solution {
         Ok(solution) => println!("Solution is \n{}", solution),
@@ -15,29 +18,41 @@ pub enum Part {
 }
 
 #[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
-pub struct Pos {
-    x: usize,
-    y: usize,
+pub struct Pos<T:Num+Copy> {
+    x: T,
+    y: T,
 }
 
-impl Pos {
-    pub fn x(&self) -> usize {
+impl<T:Num+Copy> TryFrom<(&str, &str)> for Pos<T> {
+    type Error = anyhow::Error;
+
+    fn try_from((x, y): (&str, &str)) -> Result<Self, Self::Error> {
+        Ok(Pos::new(
+            T::from_str_radix(x, 10).map_err(|_| anyhow::Error::msg("Not a valid number for bound T"))?,
+            T::from_str_radix(y, 10).map_err(|_| anyhow::Error::msg("Not a valid number for bound T"))?,
+        ))
+    }
+}
+impl<T:Num+Copy> Pos<T> {
+    pub fn x(&self) -> T {
         self.x
     }
-    pub fn y(&self) -> usize {
+    pub fn y(&self) -> T {
         self.y
     }
 
-    pub fn new(x: usize, y: usize) -> Self {
+    pub fn new(x: T, y: T) -> Self {
         Self { x, y }
     }
-    pub fn set_x(&mut self, x: usize) {
+    pub fn set_x(&mut self, x: T) {
         self.x = x;
     }
-    pub fn set_y(&mut self, y: usize) {
+    pub fn set_y(&mut self, y: T) {
         self.y = y;
     }
 }
+pub type UPos=Pos<usize>;
+pub type IPos=Pos<isize>;
 
 pub type Pattern = u8;
 
@@ -50,10 +65,10 @@ pub fn get_adjacent_positions<const PATTERN: Pattern>(
     y: usize,
     height: usize,
     length: usize,
-) -> anyhow::Result<Vec<Pos>> {
+) -> anyhow::Result<Vec<Pos<usize>>> {
     let (x, y) = (x as isize, y as isize);
     let (length, height) = (length as isize, height as isize);
-    let bounded = |x1, y1, v: &mut Vec<Pos>| {
+    let bounded = |x1, y1, v: &mut Vec<UPos>| {
         if !(x1 >= length || y1 >= height || y1 < 0 || x1 < 0) {
             v.push(Pos::new(x1 as usize, y1 as usize))
         }

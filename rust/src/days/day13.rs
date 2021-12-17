@@ -1,4 +1,4 @@
-use aoc_2021::{Day, Pos, Solution1, Solution2};
+use aoc_2021::{Day, UPos, Solution1, Solution2};
 use std::convert::TryFrom;
 
 use anyhow::anyhow;
@@ -28,9 +28,9 @@ impl TryFrom<&String> for Fold {
     }
 }
 
-fn parse(lines: Vec<String>) -> anyhow::Result<(Vec<Pos>, Vec<Fold>)> {
+fn parse(lines: Vec<String>) -> anyhow::Result<(Vec<UPos>, Vec<Fold>)> {
     let mut iter = lines.iter();
-    let points: Vec<Pos> = iter
+    let points: Vec<UPos> = iter
         .by_ref()
         .take_while(|x| !x.is_empty())
         .map(|x| {
@@ -40,7 +40,7 @@ fn parse(lines: Vec<String>) -> anyhow::Result<(Vec<Pos>, Vec<Fold>)> {
         .map(|x| {
             x.and_then(|(x, y)| {
                 usize::from_str_radix(x, 10)
-                    .and_then(|x| usize::from_str_radix(y, 10).and_then(|y| Ok(Pos::new(x, y))))
+                    .and_then(|x| usize::from_str_radix(y, 10).and_then(|y| Ok(UPos::new(x, y))))
                     .map_err(|x| anyhow!(x))
             })
         })
@@ -49,7 +49,7 @@ fn parse(lines: Vec<String>) -> anyhow::Result<(Vec<Pos>, Vec<Fold>)> {
     Ok((points, folds))
 }
 
-fn min_max(points: &Vec<Pos>) -> (Pos, Pos) {
+fn min_max(points: &Vec<UPos>) -> (UPos, UPos) {
     let (mut min_x, mut min_y, mut max_x, mut max_y) = (usize::MAX, usize::MAX, 0usize, 0usize);
     for point in points {
         if point.x() < min_x {
@@ -65,11 +65,11 @@ fn min_max(points: &Vec<Pos>) -> (Pos, Pos) {
             max_y = point.y();
         }
     }
-    (Pos::new(min_x, min_y), Pos::new(max_x, max_y))
+    (UPos::new(min_x, min_y), UPos::new(max_x, max_y))
 }
 
 impl Fold {
-    fn fold(&self, points: &mut Vec<Pos>, (min, mut max): (Pos, Pos)) -> anyhow::Result<Pos> {
+    fn fold(&self, points: &mut Vec<UPos>, (min, mut max): (UPos, UPos)) -> anyhow::Result<UPos> {
         match self {
             Fold::XAxis(fold) => {
                 if *fold < (max.x() - min.x()) / 2 {
@@ -143,7 +143,7 @@ impl Solution2 for Day13 {
         let mut s = String::with_capacity((max.y() - min.y()) * ((max.x() - min.x()) + 1));
         for y in min.y()..=max.y() {
             for x in min.x()..=max.x() {
-                if points.contains(&Pos::new(x, y)) {
+                if points.contains(&UPos::new(x, y)) {
                     s.push('#');
                 } else {
                     s.push('.');

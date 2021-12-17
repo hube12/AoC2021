@@ -1,4 +1,4 @@
-use aoc_2021::{Day, Pos, Solution1, Solution2};
+use aoc_2021::{Day, UPos, Solution1, Solution2};
 
 #[derive(Default)]
 pub struct Day4;
@@ -11,7 +11,7 @@ use std::collections::{HashMap, HashSet};
 #[derive(Debug)]
 pub struct Board {
     /// represents value in (col,row)
-    map: HashMap<usize, Vec<Pos>>,
+    map: HashMap<usize, Vec<UPos>>,
     /// Marked number in each row
     rows: Vec<usize>,
     /// Marked number in each row
@@ -37,10 +37,10 @@ impl Board {
             let number = usize::from_str_radix(number, 10)?;
             match self.map.entry(number) {
                 Entry::Occupied(mut e) => {
-                    e.get_mut().push(Pos::new(col, row));
+                    e.get_mut().push(UPos::new(col, row));
                 }
                 Entry::Vacant(e) => {
-                    e.insert(vec![Pos::new(col, row)]);
+                    e.insert(vec![UPos::new(col, row)]);
                 }
             }
         }

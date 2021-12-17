@@ -1,4 +1,4 @@
-use aoc_2021::{get_adjacent_positions, Day, Pos, Solution1, Solution2, CROSS};
+use aoc_2021::{get_adjacent_positions, Day, UPos, Solution1, Solution2, CROSS};
 use std::cmp::{max, Ordering};
 use std::collections::{BinaryHeap, HashMap};
 
@@ -8,14 +8,14 @@ pub struct Day15;
 impl Day for Day15 {}
 
 type Cost = u32;
-type Adjacents = Vec<(Pos, Cost)>;
-type Graph = HashMap<Pos, Adjacents>;
+type Adjacents = Vec<(UPos, Cost)>;
+type Graph = HashMap<UPos, Adjacents>;
 
 fn make_graph(matrix: Vec<Vec<u32>>, length: usize, height: usize) -> anyhow::Result<Graph> {
     let mut map = HashMap::with_capacity(length * height);
     for y in 0..height {
         for x in 0..length {
-            let entry = map.entry(Pos::new(x, y)).or_insert(Vec::with_capacity(4));
+            let entry = map.entry(UPos::new(x, y)).or_insert(Vec::with_capacity(4));
             let positions = get_adjacent_positions::<CROSS>(x, y, height, length)?;
             for pos in positions {
                 entry.push((pos, matrix[pos.y()][pos.x()]))
@@ -26,7 +26,7 @@ fn make_graph(matrix: Vec<Vec<u32>>, length: usize, height: usize) -> anyhow::Re
 }
 
 #[derive(Copy, Clone, Eq, PartialEq)]
-struct State<'a>(&'a Pos, usize);
+struct State<'a>(&'a UPos, usize);
 
 impl Ord for State<'_> {
     fn cmp(&self, other: &Self) -> Ordering {
@@ -40,7 +40,7 @@ impl PartialOrd for State<'_> {
     }
 }
 
-fn find_min_cost<'a>(start: &'a Pos, destination: &Pos, graph: &'a Graph) -> Option<usize> {
+fn find_min_cost<'a>(start: &'a UPos, destination: &UPos, graph: &'a Graph) -> Option<usize> {
     let mut distances = HashMap::new();
     let mut to_visit = BinaryHeap::new();
 
@@ -89,8 +89,8 @@ impl Solution1 for Day15 {
             return Err(anyhow::Error::msg("Need at least a Node"));
         }
         let graph = make_graph(matrix, length, height)?;
-        let start = Pos::new(0, 0);
-        let destination = Pos::new(length - 1, height - 1);
+        let start = UPos::new(0, 0);
+        let destination = UPos::new(length - 1, height - 1);
 
         let min_cost = find_min_cost(&start, &destination, &graph)
             .ok_or(anyhow::Error::msg("Can not compute cost"))?;
@@ -168,8 +168,8 @@ impl Solution2 for Day15 {
             })
             .collect::<Result<_, _>>()?;
         let (full_cave, height, length) = copy_5x5(matrix)?;
-        let start = Pos::new(0, 0);
-        let destination = Pos::new(length - 1, height - 1);
+        let start = UPos::new(0, 0);
+        let destination = UPos::new(length - 1, height - 1);
         let graph = make_graph(full_cave, length, height)?;
         let min_cost = find_min_cost(&start, &destination, &graph)
             .ok_or(anyhow::Error::msg("Can not compute cost"))?;

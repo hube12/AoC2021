@@ -1,4 +1,4 @@
-use aoc_2021::{get_adjacent_positions, Day, Pos, Solution1, Solution2, FULL};
+use aoc_2021::{get_adjacent_positions, Day, UPos, Solution1, Solution2, FULL};
 use std::collections::HashSet;
 
 #[derive(Default)]
@@ -40,7 +40,7 @@ fn step(matrix: &mut Vec<Vec<u32>>, height: usize, length: usize) -> anyhow::Res
         for (x, squid) in row.iter_mut().enumerate() {
             *squid += 1;
             if *squid > 9 {
-                should_flash.push(Pos::new(x, y));
+                should_flash.push(UPos::new(x, y));
             }
         }
     }
@@ -58,11 +58,11 @@ fn step(matrix: &mut Vec<Vec<u32>>, height: usize, length: usize) -> anyhow::Res
 }
 
 fn recursive_flash(
-    pos: Pos,
+    pos: UPos,
     height: usize,
     length: usize,
     matrix: &mut Vec<Vec<u32>>,
-    has_flashed: &mut HashSet<Pos>,
+    has_flashed: &mut HashSet<UPos>,
 ) -> anyhow::Result<()> {
     let value = matrix[pos.y()][pos.x()];
     if value <= 9 || has_flashed.contains(&pos) {

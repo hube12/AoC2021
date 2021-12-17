@@ -1,4 +1,4 @@
-use aoc_2021::{get_adjacent_positions, Day, Pos, Solution1, Solution2, CROSS};
+use aoc_2021::{get_adjacent_positions, Day, UPos, Solution1, Solution2, CROSS};
 use std::collections::HashSet;
 
 #[derive(Default)]
@@ -71,7 +71,7 @@ impl Solution2 for Day9 {
                     .all(|pos| matrix[pos.y()][pos.x()] > current)
                 {
                     let mut set = HashSet::with_capacity(100);
-                    recursive_flow(Pos::new(x, y), height, length, &mut matrix, &mut set)?;
+                    recursive_flow(UPos::new(x, y), height, length, &mut matrix, &mut set)?;
                     bassins_length.push(set.len());
                 }
             }
@@ -87,11 +87,11 @@ impl Solution2 for Day9 {
 }
 
 fn recursive_flow(
-    pos: Pos,
+    pos: UPos,
     height: usize,
     length: usize,
     matrix: &Vec<Vec<u32>>,
-    acc: &mut HashSet<Pos>,
+    acc: &mut HashSet<UPos>,
 ) -> anyhow::Result<()> {
     let value = matrix[pos.y()][pos.x()];
     if value == 9 || acc.contains(&pos) {

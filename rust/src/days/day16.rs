@@ -144,7 +144,7 @@ fn parse_number<const N: usize>(iter: &mut Chars) -> anyhow::Result<usize> {
 }
 
 fn parse_literal(iter: &mut Chars) -> anyhow::Result<(usize, usize)> {
-    let mut final_number:usize=0;
+    let mut final_number: usize = 0;
     let mut size = 0;
     loop {
         let not_last_group = iter
@@ -152,13 +152,13 @@ fn parse_literal(iter: &mut Chars) -> anyhow::Result<(usize, usize)> {
             .ok_or(anyhow::Error::msg("Missing char for last group"))?;
         let number = parse_number::<4>(iter)?;
         size += 5;
-        final_number+=number;
+        final_number += number;
         match not_last_group {
             '0' => {
                 break;
             }
             '1' => {
-                final_number*=16;
+                final_number *= 16;
                 continue;
             }
             _ => {
@@ -169,7 +169,10 @@ fn parse_literal(iter: &mut Chars) -> anyhow::Result<(usize, usize)> {
     Ok((final_number, size))
 }
 
-fn parse_packet<const REDUCE:bool>(iter: &mut Chars, deep: usize) -> anyhow::Result<(Vec<Packet>, usize)> {
+fn parse_packet<const REDUCE: bool>(
+    iter: &mut Chars,
+    deep: usize,
+) -> anyhow::Result<(Vec<Packet>, usize)> {
     let (version, r#type, header_size) = parse_header(iter)?;
     match r#type {
         Type::Literal => {
@@ -220,9 +223,11 @@ fn parse_packet<const REDUCE:bool>(iter: &mut Chars, deep: usize) -> anyhow::Res
                     (res, packet_size)
                 }
             };
-            if REDUCE{
+            if REDUCE {
                 let packet = match operator_type {
-                    OperatorType::Sum => Packet::new(version, packets.iter().map(|x| x.content).sum()),
+                    OperatorType::Sum => {
+                        Packet::new(version, packets.iter().map(|x| x.content).sum())
+                    }
                     OperatorType::Product => Packet::new(
                         version,
                         packets
@@ -246,9 +251,9 @@ fn parse_packet<const REDUCE:bool>(iter: &mut Chars, deep: usize) -> anyhow::Res
                             .ok_or(anyhow::Error::msg("Missing packet 0"))?
                             .content
                             > packets
-                            .get(1)
-                            .ok_or(anyhow::Error::msg("Missing packet 1"))?
-                            .content
+                                .get(1)
+                                .ok_or(anyhow::Error::msg("Missing packet 1"))?
+                                .content
                         {
                             1
                         } else {
@@ -261,10 +266,10 @@ fn parse_packet<const REDUCE:bool>(iter: &mut Chars, deep: usize) -> anyhow::Res
                             .get(0)
                             .ok_or(anyhow::Error::msg("Missing packet 0"))?
                             .content
-                            <packets
-                            .get(1)
-                            .ok_or(anyhow::Error::msg("Missing packet 1"))?
-                            .content
+                            < packets
+                                .get(1)
+                                .ok_or(anyhow::Error::msg("Missing packet 1"))?
+                                .content
                         {
                             1
                         } else {
@@ -278,9 +283,9 @@ fn parse_packet<const REDUCE:bool>(iter: &mut Chars, deep: usize) -> anyhow::Res
                             .ok_or(anyhow::Error::msg("Missing packet 0"))?
                             .content
                             == packets
-                            .get(1)
-                            .ok_or(anyhow::Error::msg("Missing packet 1"))?
-                            .content
+                                .get(1)
+                                .ok_or(anyhow::Error::msg("Missing packet 1"))?
+                                .content
                         {
                             1
                         } else {
@@ -289,16 +294,15 @@ fn parse_packet<const REDUCE:bool>(iter: &mut Chars, deep: usize) -> anyhow::Res
                     ),
                 };
                 Ok((vec![packet], size))
-            }else{
-                packets.insert(0,Packet::new(version,0));
-                Ok((packets,size))
+            } else {
+                packets.insert(0, Packet::new(version, 0));
+                Ok((packets, size))
             }
-
         }
     }
 }
 
-fn parse<const REDUCE:bool>(bin: &str) -> anyhow::Result<Vec<Packet>> {
+fn parse<const REDUCE: bool>(bin: &str) -> anyhow::Result<Vec<Packet>> {
     let mut iter = bin.chars();
     let (packets, _) = parse_packet::<REDUCE>(&mut iter, 0)?;
     if iter.any(|x| x != '0') {
@@ -324,8 +328,12 @@ impl Solution2 for Day16 {
     fn run_solution2(&self, lines: Vec<String>) -> anyhow::Result<String> {
         let bits = lines.join("");
         let bin = convert_to_binary_from_hex(bits.as_str())?;
-        let packets =  parse::<true>(bin.as_str())?;
-        Ok(packets.first().ok_or(anyhow::Error::msg("Missing a packet"))?.content.to_string())
+        let packets = parse::<true>(bin.as_str())?;
+        Ok(packets
+            .first()
+            .ok_or(anyhow::Error::msg("Missing a packet"))?
+            .content
+            .to_string())
     }
 }
 

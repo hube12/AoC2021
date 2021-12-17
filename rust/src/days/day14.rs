@@ -1,4 +1,4 @@
-use aoc_2021::{Day, Pos, Solution1, Solution2};
+use aoc_2021::{Day, UPos, Solution1, Solution2};
 use std::collections::{HashMap, VecDeque};
 
 #[derive(Default)]
@@ -68,7 +68,7 @@ fn dumb_process_polymer(
     Ok(new)
 }
 
-fn min_max(mut v: Vec<char>) -> anyhow::Result<Pos> {
+fn min_max(mut v: Vec<char>) -> anyhow::Result<UPos> {
     v.sort();
     let mut maxi = 0;
     let mut mini = usize::MAX;
@@ -92,7 +92,7 @@ fn min_max(mut v: Vec<char>) -> anyhow::Result<Pos> {
             break;
         }
     }
-    Ok(Pos::new(mini, maxi))
+    Ok(UPos::new(mini, maxi))
 }
 
 impl Solution1 for Day14 {
